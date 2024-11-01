@@ -314,7 +314,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         const email = options.getString('email');
 
         // Crear el embed
-        const embed = new EmbedBuilder() // Nota: Usa EmbedBuilder en lugar de MessageEmbed
+        const embed = new EmbedBuilder()
             .setColor('#000000') // Color negro
             .setTitle('New Gmail Submission!')
             .addFields(
@@ -323,16 +323,30 @@ client.on(Events.InteractionCreate, async (interaction) => {
             )
             .setTimestamp(); // Agrega automáticamente la fecha y hora actual
 
-        // Obtener el canal y enviar el embed
-        const channel = await client.channels.fetch(1238821182908928051); // Reemplaza CHANNEL_ID por el ID del canal correcto
-        if (channel) {
-            await channel.send({ embeds: [embed] });
-            await interaction.reply({ content: 'Email sent!', ephemeral: true });
-        } else {
-            await interaction.reply({ content: 'Channel not found.', ephemeral: true });
+        try {
+            const channel = await client.channels.fetch('1238821182908928051'); // Asegúrate de que el ID esté entre comillas
+            if (channel) {
+                await channel.send({ embeds: [embed] });
+                await interaction.reply({ content: 'Email sent!', ephemeral: true });
+            } else {
+                await interaction.reply({ content: 'Channel not found.', ephemeral: true });
+            }
+        } catch (error) {
+            console.error('Error al obtener el canal:', error);
+            await interaction.reply({ content: 'An error occurred while trying to send the email.', ephemeral: true });
         }
-    } // <-- Asegúrate de que este cierre esté presente
+    }
+});
 
-}); // Agrega esta llave de cierre aquí.
+// Iniciar sesión en Discord con el token del bot
+client.login(Token);
 
-    client.login(Token);
+
+
+
+
+
+
+
+
+ChatGPT puede cometer errores. Comprueb
