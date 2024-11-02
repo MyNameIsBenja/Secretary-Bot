@@ -14,7 +14,7 @@ const client = new Client({
 // Create an HTTP server to keep the bot alive
 const server = http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('the bot is a nigga working!');
+    res.end('the bot is working!');
 });
 
 // Listen on port 3000
@@ -243,96 +243,25 @@ client.on(Events.InteractionCreate, async (interaction) => {
                             { name: 'Ban Date', value: banDate, inline: true }
                         );
 
-                    await buttonInteraction.channel.send({ embeds: [confirmationEmbed] });
+                    await buttonInteraction.reply({ embeds: [confirmationEmbed] });
                 } catch (error) {
-                    await buttonInteraction.reply({ content: "An error occurred while trying to ban the user.", ephemeral: true });
                     console.error(error);
+                    await buttonInteraction.reply({ content: `Failed to ban ${username}.`, ephemeral: true });
                 }
             } else if (buttonInteraction.customId === 'denied') {
-                const deniedEmbed = new EmbedBuilder()
+                const denialEmbed = new EmbedBuilder()
                     .setColor(000000)
                     .setTitle('Punishment Denied')
                     .setDescription(`${buttonInteraction.user.username} has denied the punishment.`);
 
-                await buttonInteraction.channel.send({ embeds: [deniedEmbed] });
+                await buttonInteraction.reply({ embeds: [denialEmbed] });
             }
         });
-    } else if (commandName === 'ot') {
-        const host = interaction.user;
-        const coHostUser = options.getUser('cohost');
-        const coHost = coHostUser ? `<@${coHostUser.id}>` : 'N/A';
 
-        const response = `**SPECIAL PROTECTION FORCES OBSERVATIONAL TRYOUT**\n<@&1255428211525947453>\n\n` +
-            `**Host:** <@${host.id}>\n` +
-            `**Co-Host/Supervisor:** ${coHost}\n` +
-            `**Game link:** https://www.roblox.com/games/15716438340/SPF\n\n` +
-            `Our Entrance Program consists of several stages designed to assess and determine your enthusiasm for joining our team. You will be immersed in a four-stage process, during which you will demonstrate your suitability to become an operative within the division and to earn a place with us. Both the program and the EP will be challenging, with the aim of testing your skills and abilities, and assessing what you can bring to our team. Only those who demonstrate the greatest discipline and determination will be accepted. If you are not willing to face these challenges, consider that this process is not right for you.\n\n` +
-            `**[AVATAR REGULATIONS]**\n` +
-            `[:] You must not equip any accessories.\n` +
-            `[:] Use ROBLOX pre-terminated clothing.\n` +
-            `[:] Must use the body color 'Very Black'.\n\n` +
-            `**Starting within 5 minutes.**\n` +
-            `**[EP]** https://discord.gg/5meYRVq8QF`;
+        collector.on('end', collected => {
+            if (collected.size === 0) msg.edit({ components: [] }); // Disable buttons if no clicks
+        });
+    }
+});
 
-        await interaction.reply(response);
-    } else if (commandName === 'blacklist-database') {
-        // Create an embed to display all banned users
-        const blacklistEmbed = new EmbedBuilder()
-            .setColor(000000)
-            .setTitle('Blacklist Database');
-
-        // Add fields for each banned user
-        if (bansDatabase.length === 0) {
-            blacklistEmbed.setDescription('No users are currently banned.');
-        } else {
-            bansDatabase.forEach(ban => {
-                blacklistEmbed.addFields(
-                    { name: 'USERNAME', value: ban.username, inline: true },
-                    { name: 'ID', value: ban.userId, inline: true },
-                    { name: 'BAN LENGTH', value: ban.duration, inline: true },
-                    { name: 'APPROVED BY', value: ban.approvedBy, inline: true },
-                    { name: 'BAN DATE', value: ban.banDate, inline: true }
-                );
-            });
-        }
-
-        await interaction.reply({ embeds: [blacklistEmbed] });
-    } else if (commandName === 'remove-blacklist') {
-        const userIdToRemove = options.getString('id');
-        const index = bansDatabase.findIndex(ban => ban.userId === userIdToRemove);
-
-        if (index === -1) {
-            return interaction.reply({ content: "User ID not found in the blacklist.", ephemeral: true });
-        }
-
-        // Remove the user from the bansDatabase
-        bansDatabase.splice(index, 1);
-        await interaction.reply({ content: `User with ID ${userIdToRemove} has been removed from the blacklist.`, ephemeral: true });
-        
-    } if (commandName === 'sendemail') {
-        const username = options.getString('username');
-        const email = options.getString('email');
-
-        // Crear el embed
-        const embed = new EmbedBuilder() // Nota: Usa EmbedBuilder en lugar de MessageEmbed
-            .setColor('#000000') // Color negro
-            .setTitle('New Gmail Submission!')
-            .addFields(
-                { name: 'Username', value: username, inline: true },
-                { name: 'Gmail', value: email, inline: true }
-            )
-            .setTimestamp(); // Agrega automáticamente la fecha y hora actual
-
-        // Obtener el canal y enviar el embed
-        const channel = await client.channels.fetch(1238821182908928051); // Reemplaza CHANNEL_ID por el ID del canal correcto
-        if (channel) {
-            await channel.send({ embeds: [embed] });
-            await interaction.reply({ content: 'Email sent!', ephemeral: true });
-        } else {
-            await interaction.reply({ content: 'Channel not found.', ephemeral: true });
-        }
-    } // <-- Asegúrate de que este cierre esté presente
-
-}); // Agrega esta llave de cierre aquí.
-
-    client.login(Token);
+client.login(Token);
